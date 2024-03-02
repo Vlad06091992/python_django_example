@@ -10,7 +10,8 @@ urlpatterns = [
     path('about', about, name='about'),
     path('feedback', feedback, name='feedback'),
     path('login', login, name='login'),
-    path('add_page', addpage, name='add_page'),
+    # path('add_page', addpage, name='add_page'),
+    path('add_page', AddPage.as_view(), name='add_page'),
     path('cats/<int:catId>/'
          '', categories),
     # path('post/<slug:post_slug>/', show_post, name='post'),

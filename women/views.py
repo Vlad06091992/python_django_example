@@ -1,5 +1,6 @@
 # from msilib.schema import ListView
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, CreateView
+from django.urls import reverse_lazy
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import redirect, render, get_object_or_404
 from women.models import *
@@ -102,22 +103,32 @@ def login(request):
 #     return render(request, 'women/addPage.html/', {'form': form, 'title': "Добавить статью"})
 
 
-def addpage(request):
-    if request.method == 'POST':
-        form = AddPostForm(request.POST, request.FILES)
+# def addpage(request):
+#     if request.method == 'POST':
+#         form = AddPostForm(request.POST, request.FILES)
+#
+#         # print(form.is_valid())
+#
+#         if form.is_valid():
+#             form.save()
+#             return redirect('home')  # Добавлен явный возврат
+#         else:
+#             # Получаем словарь ошибок из формы
+#             errors = form.errors
+#             print(errors)  # Выводим ошибки в консоль для отладки
+#     else:
+#         form = AddPostForm()
+#     return render(request, 'women/addPage.html/', {'form': form, 'title': "Добавить статью"})
 
-        # print(form.is_valid())
-
-        if form.is_valid():
-            form.save()
-            return redirect('home')  # Добавлен явный возврат
-        else:
-            # Получаем словарь ошибок из формы
-            errors = form.errors
-            print(errors)  # Выводим ошибки в консоль для отладки
-    else:
-        form = AddPostForm()
-    return render(request, 'women/addPage.html/', {'form': form, 'title': "Добавить статью"})
+class AddPage(CreateView):
+    form_class = AddPostForm
+    template_name = 'women/addPage.html'
+    success_url = reverse_lazy('home')
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['menu'] = menu
+        context['title'] = "Добавить статью"
+        return context
 
 
 # def show_post(request, post_id):
