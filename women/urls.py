@@ -3,7 +3,10 @@ from .views import *
 
 urlpatterns = [
     # path('', index, name='home'),
+    # path('category/<slug:category_slug>/', show_category, name='category'),
     path('', WomenHome.as_view(), name='home'),
+    path('category/<slug:category_slug>/', ShowCategory.as_view(), name='category'),
+
     path('about', about, name='about'),
     path('feedback', feedback, name='feedback'),
     path('login', login, name='login'),
@@ -11,7 +14,6 @@ urlpatterns = [
     path('cats/<int:catId>/'
          '', categories),
     path('post/<slug:post_slug>/', show_post, name='post'),
-    path('category/<slug:category_slug>/', show_category, name='category'),
     re_path(r'^archive/(?P<year>[0-9]{4})/', archive),
 ]
 

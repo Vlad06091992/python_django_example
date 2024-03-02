@@ -24,6 +24,14 @@ menu = [
 #     context = {'posts': posts, 'title': "Главная страница", 'cat_selected': 0}
 #     return render(request, 'women/index.html/', context)
 
+# def show_category(request, category_slug):
+#     category = Category.objects.get(slug=category_slug)
+#     posts = Women.objects.all().filter(cat_id=category.pk)
+#     if len(posts) == 0:
+#         raise Http404()
+#     context = {'cat_selected': category.pk, 'posts': posts, 'title': "Отображение по рубрикам"}
+#     return render(request, 'women/index.html/', context)
+
 
 class WomenHome(ListView):
     model = Women
@@ -40,14 +48,30 @@ class WomenHome(ListView):
     def get_queryset(self):
         return Women.objects.filter(is_published=True)
 
-def show_category(request, category_slug):
-    category = Category.objects.get(slug=category_slug)
-    posts = Women.objects.all().filter(cat_id=category.pk)
-    if len(posts) == 0:
-        raise Http404()
-    context = {'cat_selected': category.pk, 'posts': posts, 'title': "Отображение по рубрикам"}
-    return render(request, 'women/index.html/', context)
+class ShowCategory(ListView):
+    model = Women
+    template_name = 'women/index.html/'
+    context_object_name = 'posts'
+    extra_context = {'title': "Главная страница"}
+    allow_empty = False
 
+    def get_context_data(self, * ,object_list=None, **kwargs):
+      context = super().get_context_data(**kwargs)
+
+      # category = Category.objects.get(slug=self.kwargs['category_slug'])
+      # context['title'] = 'Категория' + ' ' + str(category.name)
+      # context['menu'] = menu
+      # context['cat_selected'] = category.pk
+
+      context['title'] = 'Категория' + ' ' + str(context['posts'][0].cat)
+      context['menu'] = menu
+      context['cat_selected'] = context['posts'][0].cat_id
+
+
+      return context
+
+    def get_queryset(self):
+        return Women.objects.filter(cat__slug=self.kwargs['category_slug'], is_published=True)
 
 def about(request):
     return render(request, 'women/about.html/', {'title': "О сайте"})
