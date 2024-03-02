@@ -1,5 +1,5 @@
 # from msilib.schema import ListView
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import redirect, render, get_object_or_404
 from women.models import *
@@ -11,6 +11,7 @@ menu = [
     {"title": "Войти", "url_name": "login"},
     {"title": "Добавить статью", "url_name": "add_page"}
 ]
+
 
 # Create your views here.
 
@@ -39,14 +40,15 @@ class WomenHome(ListView):
     context_object_name = 'posts'
     extra_context = {'title': "Главная страница"}
 
-    def get_context_data(self, * ,object_list=None, **kwargs):
-      context = super().get_context_data(**kwargs)
-      context['menu'] = menu
-      context['cat_selected'] = 0
-      return context
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['menu'] = menu
+        context['cat_selected'] = 0
+        return context
 
     def get_queryset(self):
         return Women.objects.filter(is_published=True)
+
 
 class ShowCategory(ListView):
     model = Women
@@ -55,23 +57,23 @@ class ShowCategory(ListView):
     extra_context = {'title': "Главная страница"}
     allow_empty = False
 
-    def get_context_data(self, * ,object_list=None, **kwargs):
-      context = super().get_context_data(**kwargs)
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-      # category = Category.objects.get(slug=self.kwargs['category_slug'])
-      # context['title'] = 'Категория' + ' ' + str(category.name)
-      # context['menu'] = menu
-      # context['cat_selected'] = category.pk
+        # category = Category.objects.get(slug=self.kwargs['category_slug'])
+        # context['title'] = 'Категория' + ' ' + str(category.name)
+        # context['menu'] = menu
+        # context['cat_selected'] = category.pk
 
-      context['title'] = 'Категория' + ' ' + str(context['posts'][0].cat)
-      context['menu'] = menu
-      context['cat_selected'] = context['posts'][0].cat_id
+        context['title'] = 'Категория' + ' ' + str(context['posts'][0].cat)
+        context['menu'] = menu
+        context['cat_selected'] = context['posts'][0].cat_id
 
-
-      return context
+        return context
 
     def get_queryset(self):
         return Women.objects.filter(cat__slug=self.kwargs['category_slug'], is_published=True)
+
 
 def about(request):
     return render(request, 'women/about.html/', {'title': "О сайте"})
@@ -122,10 +124,23 @@ def addpage(request):
 #     posts = Women.objects.all()
 #     return render(request, 'women/post.html/', {'post': posts[post_id].content})
 
-def show_post(request, post_slug):
-    post = get_object_or_404(Women, slug=post_slug)
-    cat_selected = post.cat_id
-    return render(request, 'women/post.html', {'post': post, 'cat_selected': cat_selected})
+
+class ShowPost(DetailView):
+    model = Women
+    template_name = 'women/post.html/'
+    slug_url_kwarg = 'post_slug'
+    context_object_name = 'post'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+       context = super().get_context_data(**kwargs)
+       context['title'] = str(context['post'].title)
+       context['menu'] = menu
+       return context
+
+# def show_post(request, post_slug):
+#     post = get_object_or_404(Women, slug=post_slug)
+#     cat_selected = post.cat_id
+#     return render(request, 'women/post.html', {'post': post, 'cat_selected': cat_selected})
 
 
 # def show_post(request, post_id):

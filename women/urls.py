@@ -13,7 +13,8 @@ urlpatterns = [
     path('add_page', addpage, name='add_page'),
     path('cats/<int:catId>/'
          '', categories),
-    path('post/<slug:post_slug>/', show_post, name='post'),
+    # path('post/<slug:post_slug>/', show_post, name='post'),
+    path('post/<slug:post_slug>/', ShowPost.as_view(), name='post'),
     re_path(r'^archive/(?P<year>[0-9]{4})/', archive),
 ]
 
